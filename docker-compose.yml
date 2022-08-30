@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  dev:
+    image: tensorflow/tensorflow:2.9.1-gpu
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      HYDRA_FULL_ERROR: 1
+    shm_size: "32gb"
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]

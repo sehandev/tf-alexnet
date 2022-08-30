@@ -19,5 +19,5 @@ poetry install
 ## Run
 Edit 'conf/config.yaml' and then run 'main.py'
 ```bash
-python main.py
+poetry run python main.py
 ```
