@@ -7,6 +7,7 @@ import tensorflow as tf
 import keras.api._v2.keras as keras
 from keras import layers
 
+
 def set_seed(seed: int) -> None:
     os.environ["PYTHONHASHSEED"] = str(seed)
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
