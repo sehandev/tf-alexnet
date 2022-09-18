@@ -2,7 +2,9 @@ import os
 import random
 from typing import Dict
 
+import hydra
 import numpy as np
+from omegaconf import DictConfig
 import tensorflow as tf
 import keras.api._v2.keras as keras
 from keras import layers
@@ -16,7 +18,7 @@ def set_seed(seed: int) -> None:
     random.seed(seed)
 
 
-def main(cfg: Dict) -> None:
+def run(cfg: Dict) -> None:
     # 0.
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, cfg["gpus"]))
     set_seed(cfg["seed"])
@@ -84,16 +86,13 @@ def main(cfg: Dict) -> None:
         # 6. 정확도 평가하기
         print("[ Test ]")
         loss, accuracy = model.evaluate(test_dataset)
-        print(loss, accuracy)
+        print(f"loss : {loss}, accuracy : {accuracy}")
+
+
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def keras_app(cfg: DictConfig) -> None:
+    run(cfg)
 
 
 if __name__ == "__main__":
-    cfg = {}
-    cfg["gpus"] = [4, 5]
-    cfg["seed"] = 42
-    cfg["dropout"] = 0.5
-    cfg["epoch"] = 5
-    cfg["train_batch_size"] = 128
-    cfg["test_batch_size"] = 256
-
-    main(cfg)
+    keras_app()

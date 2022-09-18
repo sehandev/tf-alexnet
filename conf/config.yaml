@@ -1,0 +1,6 @@
+gpus: [4, 5]
+seed: 42
+dropout: 0.5
+epoch: 5
+train_batch_size: 128
+test_batch_size: 256
