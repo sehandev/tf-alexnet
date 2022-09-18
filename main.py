@@ -4,10 +4,12 @@ from typing import Dict
 
 import hydra
 import numpy as np
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 import tensorflow as tf
 import keras.api._v2.keras as keras
 from keras import layers
+import wandb
+from wandb.keras import WandbCallback
 
 
 def set_seed(seed: int) -> None:
@@ -18,8 +20,23 @@ def set_seed(seed: int) -> None:
     random.seed(seed)
 
 
-def run(cfg: Dict) -> None:
-    # 0.
+def init_wandb(cfg: DictConfig) -> None:
+    os.environ["WANDB_API_KEY"] = cfg.wandb_api_key
+    wandb.init(
+        project=cfg.wandb_project,
+        name=f"{cfg.wandb_name}-{cfg.now}",
+        config={
+            "seed": cfg.seed,
+            "epochs": cfg.epoch,
+            "batch_size": cfg.train_batch_size,
+        },
+    )
+
+
+def run(cfg: DictConfig) -> None:
+    # 0. Setting
+    print(OmegaConf.to_yaml(cfg))
+    init_wandb(cfg)
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, cfg["gpus"]))
     set_seed(cfg["seed"])
     strategy = tf.distribute.MultiWorkerMirroredStrategy()
@@ -81,7 +98,16 @@ def run(cfg: Dict) -> None:
         )
 
         # 5. 모델 훈련
-        model.fit(train_dataset, validation_data=test_dataset, epochs=cfg["epoch"])
+        model.fit(
+            train_dataset,
+            validation_data=test_dataset,
+            epochs=cfg["epoch"],
+            callbacks=[
+                WandbCallback(
+                    save_model=False,
+                )
+            ],
+        )
 
         # 6. 정확도 평가하기
         print("[ Test ]")
