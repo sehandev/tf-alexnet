@@ -20,7 +20,7 @@ def main(cfg: Dict) -> None:
     # 0.
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, cfg["gpus"]))
     set_seed(cfg["seed"])
-    strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
+    strategy = tf.distribute.MultiWorkerMirroredStrategy()
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = (
         tf.data.experimental.AutoShardPolicy.DATA
